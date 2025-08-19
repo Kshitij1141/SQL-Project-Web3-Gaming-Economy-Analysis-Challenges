@@ -1,0 +1,1120 @@
+SQL Project: Web3 Gaming Economy Analysis Challenges
+ 
+
+This project demonstrates a comprehensive range of SQL skills through 50 practical challenges based on a hypothetical Web3 gaming platform database. Each question requires querying various aspects of player data, guild management, NFT assets, marketplace transactions, and governance.
+
+ 
+
+Database Schema Reference
+ 
+
+This is the schema for all tables used in the following challenges:
+
+Table Name
+Columns (Headers)
+Players
+player_id (INT, PK), username (VARCHAR), wallet_address (VARCHAR), registration_date (DATE), last_login_date (DATE), total_game_time_minutes (INT)
+Guilds
+guild_id (INT, PK), guild_name (VARCHAR), creation_date (DATE), leader_player_id (INT, FK to Players), guild_treasury_balance (DECIMAL)
+PlayerGuildHistory
+membership_id (INT, PK), player_id (INT, FK to Players), guild_id (INT, FK to Guilds), join_date (DATE), leave_date (DATE, NULLABLE)
+NFT_Assets
+asset_id (INT, PK), asset_name (VARCHAR), asset_type (VARCHAR), rarity (VARCHAR), initial_mint_date (DATE), current_owner_player_id (INT, FK to Players)
+MarketplaceTransactions
+transaction_id (INT, PK), asset_id (INT, FK to NFT_Assets), seller_player_id (INT, FK to Players), buyer_player_id (INT, FK to Players), transaction_date (DATE), price_usd (DECIMAL), transaction_fee_usd (DECIMAL)
+GovernanceVotes
+vote_id (INT, PK), proposal_id (INT), player_id (INT, FK to Players), vote_date (DATE), vote_choice (VARCHAR), vote_weight (INT)
+Daily_Market_Prices
+price_date (DATE, PK), token_symbol (VARCHAR, PK), closing_price_usd (DECIMAL)
+Export to Sheets
+
+ 
+
+SQL Challenges and Solutions (Questions 1-50)
+ 
+
+ 
+
+Question 1
+ 
+
+Task: Retrieve the player_id, username, and wallet_address for all players registered in the game.
+
+Solution:
+
+SQL 
+SELECT
+player_id,
+username,
+wallet_address
+FROM
+Players;
+
+Explanation: This is a basic SELECT statement that retrieves specific columns (player_id, username, wallet_address) from the Players table.
+
+
+ 
+
+Question 2
+ 
+
+Task: Find the guild_name and creation_date of all guilds that were created after January 1, 2023.
+
+Solution:
+
+SQL 
+SELECT
+guild_name,
+creation_date
+FROM
+Guilds
+WHERE
+creation_date > '2023-01-01';
+
+Explanation: This query selects guild_name and creation_date from the Guilds table and filters the results using the WHERE clause to include only those guilds where the creation_date is later than January 1, 2023.
+
+
+ 
+
+Question 3
+ 
+
+Task: List the asset_name and current_owner_player_id for all NFT assets that have a rarity of 'Epic'.
+
+Solution:
+
+SQL 
+SELECT
+asset_name,
+current_owner_player_id
+FROM
+NFT_Assets
+WHERE
+rarity = 'Epic';
+
+Explanation: This query retrieves the asset_name and current_owner_player_id from the NFT_Assets table, applying a filter to select only those assets where the rarity is exactly 'Epic'.
+
+
+ 
+
+Question 4
+ 
+
+Task: Count the total number of unique players who have cast a vote in GovernanceVotes.
+
+Solution:
+
+SQL 
+SELECT
+COUNT(DISTINCT player_id) AS total_unique_voters
+FROM
+GovernanceVotes;
+
+Explanation: This query uses COUNT(DISTINCT player_id) to count only the unique player_ids in the GovernanceVotes table, effectively giving the number of unique voters.
+
+
+ 
+
+Question 5
+ 
+
+Task: Get the username and guild_name for all players who are currently members of a guild.
+
+Solution:
+
+SQL 
+SELECT
+p.username,
+g.guild_name
+FROM
+Players AS p
+JOIN
+PlayerGuildHistory AS pgh ON p.player_id = pgh.player_id
+JOIN
+Guilds AS g ON pgh.guild_id = g.guild_id
+WHERE
+pgh.leave_date IS NULL;
+
+Explanation: This query joins Players (p), PlayerGuildHistory (pgh), and Guilds (g) tables to link players to their current guilds. The WHERE pgh.leave_date IS NULL condition ensures only active memberships are considered.
+
+
+ 
+
+Question 6
+ 
+
+Task: Determine the maximum price_usd of any transaction in the MarketplaceTransactions table.
+
+Solution:
+
+SQL 
+SELECT
+MAX(price_usd) AS highest_transaction_price
+FROM
+MarketplaceTransactions;
+
+Explanation: This query uses the MAX() aggregate function to find the highest value in the price_usd column across all marketplace transactions.
+
+
+ 
+
+Question 7
+ 
+
+Task: List the username of players whose total_game_time_minutes is between 5000 and 10000 (inclusive).
+
+Solution:
+
+SQL 
+SELECT
+username
+FROM
+Players
+WHERE
+total_game_time_minutes BETWEEN 5000 AND 10000;
+
+Explanation: This query selects username from the Players table and uses the BETWEEN operator in the WHERE clause to filter for players whose total_game_time_minutes falls within the specified inclusive range.
+
+
+ 
+
+Question 8
+ 
+
+Task: Count the number of NFT_Assets for each asset_type. Display the asset_type and the count, ordered by the count in descending order.
+
+Solution:
+
+SQL 
+SELECT
+asset_type,
+COUNT(asset_id) AS num_assets
+FROM
+NFT_Assets
+GROUP BY
+asset_type
+ORDER BY
+num_assets DESC;
+
+Explanation: This query groups the NFT_Assets table by asset_type and then uses COUNT(asset_id) to find the number of assets within each type. The results are then ordered in descending order based on the num_assets count.
+
+
+ 
+
+Question 9
+ 
+
+Task: Find the player_id and vote_choice for all votes cast on proposal_id 101.
+
+Solution:
+
+SQL 
+SELECT
+player_id,
+vote_choice
+FROM
+GovernanceVotes
+WHERE
+proposal_id = 101;
+
+Explanation: This query retrieves the player_id and vote_choice from the GovernanceVotes table, filtering the results to show only those votes where the proposal_id is exactly 101.
+
+
+ 
+
+Question 10
+ 
+
+Task: Get the asset_name and price_usd of all MarketplaceTransactions that occurred in 2023 and had a price_usd greater than 500.
+
+Solution:
+
+SQL 
+SELECT
+n.asset_name,
+mt.price_usd
+FROM
+MarketplaceTransactions AS mt
+JOIN
+NFT_Assets AS n ON mt.asset_id = n.asset_id
+WHERE
+YEAR(mt.transaction_date) = 2023 AND mt.price_usd > 500;
+
+Explanation: This query joins MarketplaceTransactions with NFT_Assets to get the asset name. It then applies two filtering conditions: transaction_date in the year 2023 (using YEAR()) and price_usd greater than 500.
+
+
+ 
+
+Question 11
+ 
+
+Task: Find the player_id and username of players who registered in the year 2022.
+
+Solution:
+
+SQL 
+SELECT
+player_id,
+username
+FROM
+Players
+WHERE
+YEAR(registration_date) = 2022;
+
+Explanation: This query selects player_id and username from the Players table, using the YEAR() function to extract the year from registration_date and filter for records where the year is 2022.
+
+
+ 
+
+Question 12
+ 
+
+Task: Retrieve the guild_name and leader_player_id for guilds that have a guild_treasury_balance greater than 10000.
+
+Solution:
+
+SQL 
+SELECT
+guild_name,
+leader_player_id
+FROM
+Guilds
+WHERE
+guild_treasury_balance > 10000;
+
+Explanation: This query selects guild_name and leader_player_id from the Guilds table, filtering for guilds whose guild_treasury_balance exceeds 10000.
+
+
+ 
+
+Question 13
+ 
+
+Task: List the asset_name and rarity of all NFT assets owned by player_id 1.
+
+Solution:
+
+SQL 
+SELECT
+asset_name,
+rarity
+FROM
+NFT_Assets
+WHERE
+current_owner_player_id = 1;
+
+Explanation: This query selects asset_name and rarity from NFT_Assets, using the WHERE clause to filter for assets whose current_owner_player_id is specifically 1.
+
+
+ 
+
+Question 14
+ 
+
+Task: Count the number of players who have total_game_time_minutes of 0.
+
+Solution:
+
+SQL 
+SELECT
+COUNT(player_id) AS zero_game_time_players
+FROM
+Players
+WHERE
+total_game_time_minutes = 0;
+
+Explanation: This query counts player_ids from the Players table, but only for those records where total_game_time_minutes is exactly 0.
+
+
+ 
+
+Question 15
+ 
+
+Task: Find the username of players who are leaders of guilds.
+
+Solution:
+
+SQL 
+SELECT
+p.username
+FROM
+Players AS p
+JOIN
+Guilds AS g ON p.player_id = g.leader_player_id;
+
+Explanation: This query joins the Players table (p) with the Guilds table (g) on p.player_id = g.leader_player_id. This effectively identifies players who appear as leaders in the Guilds table, then retrieves their username.
+
+
+ 
+
+Question 16
+ 
+
+Task: Retrieve the player_id and username for players who have not logged in since January 1, 2024.
+
+Solution:
+
+SQL 
+SELECT
+player_id,
+username
+FROM
+Players
+WHERE
+last_login_date < '2024-01-01';
+
+Explanation: This query selects player_id and username from the Players table, filtering for records where last_login_date is earlier than January 1, 2024.
+
+
+ 
+
+Question 17
+ 
+
+Task: List all distinct asset_types available in the NFT_Assets table.
+
+Solution:
+
+SQL 
+SELECT DISTINCT
+asset_type
+FROM
+NFT_Assets;
+
+Explanation: This query uses the DISTINCT keyword with asset_type to retrieve only unique values from that column in the NFT_Assets table, avoiding duplicates.
+
+
+ 
+
+Question 18
+ 
+
+Task: Calculate the total guild_treasury_balance across all guilds.
+
+Solution:
+
+SQL 
+SELECT
+SUM(guild_treasury_balance) AS total_guild_treasury
+FROM
+Guilds;
+
+Explanation: This query uses the SUM() aggregate function to calculate the sum of all values in the guild_treasury_balance column from the Guilds table.
+
+
+ 
+
+Question 19
+ 
+
+Task: Find the asset_name and asset_type of NFTs that were minted in the year 2023.
+
+Solution:
+
+SQL 
+SELECT
+asset_name,
+asset_type
+FROM
+NFT_Assets
+WHERE
+YEAR(initial_mint_date) = 2023;
+
+Explanation: This query selects the asset_name and asset_type from NFT_Assets, filtering by using the YEAR() function to extract the year from initial_mint_date and comparing it to 2023.
+
+
+ 
+
+Question 20
+ 
+
+Task: Identify the username of players who have made at least one MarketplaceTransaction as a seller.
+
+Solution:
+
+SQL 
+SELECT DISTINCT
+p.username
+FROM
+Players AS p
+JOIN
+MarketplaceTransactions AS mt ON p.player_id = mt.seller_player_id;
+
+Explanation: This query joins Players (p) with MarketplaceTransactions (mt) on player_id and seller_player_id. The DISTINCT keyword ensures that each username is listed only once, even if they have sold multiple assets.
+
+
+ 
+
+Question 21
+ 
+
+Task: Retrieve the player_id and username for players whose username starts with 'G'.
+
+Solution:
+
+SQL 
+SELECT
+player_id,
+username
+FROM
+Players
+WHERE
+username LIKE 'G%';
+
+Explanation: This query selects player_id and username from Players, using the LIKE operator with the wildcard % to find usernames that begin with the letter 'G'.
+
+
+ 
+
+Question 22
+ 
+
+Task: Find the guild_name and creation_date for the 3 oldest guilds.
+
+Solution:
+
+SQL 
+SELECT
+guild_name,
+creation_date
+FROM
+Guilds
+ORDER BY
+creation_date ASC
+LIMIT 3;
+
+Explanation: This query orders all guilds by their creation_date in ascending order (oldest first) and then uses LIMIT 3 to retrieve only the top 3 results.
+
+
+ 
+
+Question 23
+ 
+
+Task: List the asset_name of NFT assets that have a price_usd of more than 1000 in any MarketplaceTransaction.
+
+Solution:
+
+SQL 
+SELECT DISTINCT
+n.asset_name
+FROM
+NFT_Assets AS n
+JOIN
+MarketplaceTransactions AS mt ON n.asset_id = mt.asset_id
+WHERE
+mt.price_usd > 1000;
+
+Explanation: This query joins NFT_Assets with MarketplaceTransactions to link assets to their transaction details. It then filters for transactions where price_usd is greater than 1000, and DISTINCT ensures unique asset names are returned.
+
+
+ 
+
+Question 24
+ 
+
+Task: Count the number of players for each registration_date year.
+
+Solution:
+
+SQL 
+SELECT
+YEAR(registration_date) AS registration_year,
+COUNT(player_id) AS num_players_registered
+FROM
+Players
+GROUP BY
+registration_year
+ORDER BY
+registration_year;
+
+Explanation: This query groups the Players table by the year extracted from registration_date (using YEAR()) and then counts the number of players within each year group. Results are ordered by the registration year.
+
+
+ 
+
+Question 25
+ 
+
+Task: Identify guild_ids that have an average guild_treasury_balance above 12000.
+
+Solution:
+
+SQL 
+SELECT
+guild_id,
+guild_name
+FROM
+Guilds
+WHERE
+guild_treasury_balance > 12000;
+
+Explanation: This query selects the guild_id and guild_name from the Guilds table and filters the results to only include guilds with a guild_treasury_balance greater than 12000. (Note: The wording "average guild_treasury_balance" might typically imply GROUP BY and HAVING if there were multiple entries per guild ID, but given guild_treasury_balance is a direct column, it's a simple WHERE filter).
+
+
+ 
+
+Question 26
+ 
+
+Task: Retrieve the player_id and username of players who have joined a guild after January 1, 2023.
+
+Solution:
+
+SQL 
+SELECT DISTINCT
+p.player_id,
+p.username
+FROM
+Players AS p
+JOIN
+PlayerGuildHistory AS pgh ON p.player_id = pgh.player_id
+WHERE
+pgh.join_date > '2023-01-01';
+
+Explanation: This query joins Players with PlayerGuildHistory and filters for entries where the join_date is after January 1, 2023. DISTINCT ensures unique player results.
+
+
+ 
+
+Question 27
+ 
+
+Task: Find the asset_name of NFT assets that have never been sold (i.e., their asset_id does not appear in MarketplaceTransactions as a seller or buyer).
+
+Solution:
+
+SQL 
+SELECT
+n.asset_name
+FROM
+NFT_Assets AS n
+LEFT JOIN
+MarketplaceTransactions AS mt ON n.asset_id = mt.asset_id
+WHERE
+mt.transaction_id IS NULL;
+
+Explanation: This query uses a LEFT JOIN to include all assets from NFT_Assets and attempts to match them with records in MarketplaceTransactions. If an asset has never been in a transaction, the mt.transaction_id will be NULL. The WHERE mt.transaction_id IS NULL clause filters for these non-transacted assets.
+
+
+ 
+
+Question 28
+ 
+
+Task: Calculate the total sum of price_usd for all 'Weapon' type NFT assets sold on the marketplace.
+
+Solution:
+
+SQL 
+SELECT
+SUM(mt.price_usd) AS total_weapon_sales
+FROM
+MarketplaceTransactions AS mt
+JOIN
+NFT_Assets AS n ON mt.asset_id = n.asset_id
+WHERE
+n.asset_type = 'Weapon';
+
+Explanation: This query joins MarketplaceTransactions with NFT_Assets to access asset_type. It then filters for asset_type = 'Weapon' and calculates the SUM() of price_usd for these filtered transactions.
+
+
+ 
+
+Question 29
+ 
+
+Task: Find the username of the player who leads the guild with guild_id 101.
+
+Solution:
+
+SQL 
+SELECT
+p.username
+FROM
+Players AS p
+JOIN
+Guilds AS g ON p.player_id = g.leader_player_id
+WHERE
+g.guild_id = 101;
+
+Explanation: This query joins Players and Guilds to connect leaders to their guilds. It then filters for the specific guild_id 101 and retrieves the username of its leader.
+
+
+ 
+
+Question 30
+ 
+
+Task: List the player_id and total_game_time_minutes for the top 5 players with the most game time.
+
+Solution:
+
+SQL 
+SELECT
+player_id,
+total_game_time_minutes
+FROM
+Players
+ORDER BY
+total_game_time_minutes DESC
+LIMIT 5;
+
+Explanation: This query orders all players by total_game_time_minutes in descending order (highest game time first) and then uses LIMIT 5 to retrieve only the top 5 results.
+
+
+ 
+
+Question 31
+ 
+
+Task: Find the asset_name and current_owner_player_id for NFT assets that have never been involved in a MarketplaceTransaction (neither as seller nor buyer).
+
+Solution:
+
+SQL 
+SELECT
+n.asset_name,
+n.current_owner_player_id
+FROM
+NFT_Assets AS n
+WHERE
+n.asset_id NOT IN (SELECT asset_id FROM MarketplaceTransactions);
+
+Explanation: This query uses a subquery with NOT IN to select asset_ids from NFT_Assets that do not exist in the MarketplaceTransactions table, indicating they have never been part of any transaction.
+
+
+ 
+
+Question 32
+ 
+
+Task: Identify guilds that have no players currently (i.e., all their PlayerGuildHistory entries have a leave_date).
+
+Solution:
+
+SQL 
+SELECT
+g.guild_name
+FROM
+Guilds AS g
+LEFT JOIN
+PlayerGuildHistory AS pgh ON g.guild_id = pgh.guild_id AND pgh.leave_date IS NULL
+WHERE
+pgh.membership_id IS NULL;
+
+Explanation: This query uses a LEFT JOIN from Guilds to PlayerGuildHistory, specifically joining on active memberships (pgh.leave_date IS NULL). If a guild has no active members, the LEFT JOIN will result in NULL values for pgh.membership_id for that guild, which is then filtered in the WHERE clause.
+
+
+ 
+
+Question 33
+ 
+
+Task: Get the username of players who have purchased an NFT asset with a rarity of 'Rare'.
+
+Solution:
+
+SQL 
+SELECT DISTINCT
+p.username
+FROM
+Players AS p
+JOIN
+MarketplaceTransactions AS mt ON p.player_id = mt.buyer_player_id
+JOIN
+NFT_Assets AS n ON mt.asset_id = n.asset_id
+WHERE
+n.rarity = 'Rare';
+
+Explanation: This query joins Players with MarketplaceTransactions (as buyer) and then with NFT_Assets to filter for purchases of 'Rare' assets. DISTINCT ensures each buyer's username appears only once.
+
+
+ 
+
+Question 34
+ 
+
+Task: Calculate the average total_game_time_minutes for players who registered in the year 2023.
+
+Solution:
+
+SQL 
+SELECT
+AVG(total_game_time_minutes) AS avg_game_time_2023_registrants
+FROM
+Players
+WHERE
+YEAR(registration_date) = 2023;
+
+Explanation: This query calculates the average of total_game_time_minutes from the Players table, but only for players whose registration_date falls within the year 2023.
+
+
+ 
+
+Question 35
+ 
+
+Task: Find the asset_name of NFT assets that have a current_owner_player_id who is also a leader_player_id of any guild.
+
+Solution:
+
+SQL 
+SELECT
+n.asset_name
+FROM
+NFT_Assets AS n
+JOIN
+Guilds AS g ON n.current_owner_player_id = g.leader_player_id;
+
+Explanation: This query joins NFT_Assets with Guilds where the current_owner_player_id of the asset matches the leader_player_id of a guild, thereby identifying assets owned by guild leaders.
+
+
+ 
+
+Question 36
+ 
+
+Task: For each proposal_id, find the total vote_weight received.
+
+Solution:
+
+SQL 
+SELECT
+proposal_id,
+SUM(vote_weight) AS total_vote_weight
+FROM
+GovernanceVotes
+GROUP BY
+proposal_id
+ORDER BY
+proposal_id;
+
+Explanation: This query groups the GovernanceVotes table by proposal_id and then uses SUM(vote_weight) to calculate the total vote weight for each unique proposal. Results are ordered by proposal_id.
+
+
+ 
+
+Question 37
+ 
+
+Task: List the player_id and username of players who have registered in the same month as player_id 1.
+
+Solution:
+
+SQL 
+SELECT
+player_id,
+username
+FROM
+Players
+WHERE
+MONTH(registration_date) = (SELECT MONTH(registration_date) FROM Players WHERE player_id = 1)
+AND player_id != 1; -- Exclude player 1 themselves
+
+Explanation: This query uses a subquery to find the registration month of player_id 1. The outer query then filters all other players whose registration_date falls in the same month.
+
+
+ 
+
+Question 38
+ 
+
+Task: Find the guild_name and guild_treasury_balance for guilds created in the year 2022 and having a balance greater than 5000.
+
+Solution:
+
+SQL 
+SELECT
+guild_name,
+guild_treasury_balance
+FROM
+Guilds
+WHERE
+YEAR(creation_date) = 2022 AND guild_treasury_balance > 5000;
+
+Explanation: This query selects guild_name and guild_treasury_balance from the Guilds table, applying two conditions: creation_date in 2022 (using YEAR()) and guild_treasury_balance greater than 5000.
+
+
+ 
+
+Question 39
+ 
+
+Task: Retrieve the asset_name and asset_type of NFT assets that have a rarity of either 'Common' or 'Rare'.
+
+Solution:
+
+SQL 
+SELECT
+asset_name,
+asset_type
+FROM
+NFT_Assets
+WHERE
+rarity IN ('Common', 'Rare');
+
+Explanation: This query selects asset_name and asset_type from NFT_Assets and uses the IN operator to filter for assets whose rarity is either 'Common' or 'Rare'.
+
+
+ 
+
+Question 40
+ 
+
+Task: For each player_id who has sold an asset, list their player_id and the total price_usd of assets they have sold.
+
+Solution:
+
+SQL 
+SELECT
+seller_player_id,
+SUM(price_usd) AS total_sales_usd
+FROM
+MarketplaceTransactions
+GROUP BY
+seller_player_id
+ORDER BY
+total_sales_usd DESC;
+
+Explanation: This query groups MarketplaceTransactions by seller_player_id and then calculates the SUM(price_usd) for each seller, showing their total sales value.
+
+
+ 
+
+Question 41
+ 
+
+Task: Find the username of players who have joined a guild, but are not currently in a guild (i.e., they have a leave_date).
+
+Solution:
+
+SQL 
+SELECT DISTINCT
+p.username
+FROM
+Players AS p
+JOIN
+PlayerGuildHistory AS pgh ON p.player_id = pgh.player_id
+WHERE
+pgh.leave_date IS NOT NULL;
+
+Explanation: This query joins Players with PlayerGuildHistory and filters for entries where leave_date is not NULL, indicating a past membership. DISTINCT ensures unique usernames.
+
+
+ 
+
+Question 42
+ 
+
+Task: Retrieve the asset_name of NFT assets that have a transaction_fee_usd greater than 10 in any MarketplaceTransaction.
+
+Solution:
+
+SQL 
+SELECT DISTINCT
+n.asset_name
+FROM
+NFT_Assets AS n
+JOIN
+MarketplaceTransactions AS mt ON n.asset_id = mt.asset_id
+WHERE
+mt.transaction_fee_usd > 10;
+
+Explanation: This query joins NFT_Assets with MarketplaceTransactions and filters for transactions where transaction_fee_usd exceeds 10. DISTINCT is used to list each relevant asset name only once.
+
+
+ 
+
+Question 43
+ 
+
+Task: Identify the guild_name and guild_id of guilds that have a guild_treasury_balance less than the average guild_treasury_balance of all guilds.
+
+Solution:
+
+SQL 
+SELECT
+guild_name,
+guild_id
+FROM
+Guilds
+WHERE
+guild_treasury_balance < (SELECT AVG(guild_treasury_balance) FROM Guilds);
+
+Explanation: This query uses a subquery to calculate the average guild_treasury_balance for all guilds. The outer query then filters guilds to include only those whose individual balance is less than this calculated average.
+
+
+ 
+
+Question 44
+ 
+
+Task: Count the number of active memberships for each guild_id (where leave_date is NULL).
+
+Solution:
+
+SQL 
+SELECT
+guild_id,
+COUNT(membership_id) AS active_members
+FROM
+PlayerGuildHistory
+WHERE
+leave_date IS NULL
+GROUP BY
+guild_id
+ORDER BY
+active_members DESC;
+
+Explanation: This query filters PlayerGuildHistory for active memberships (leave_date IS NULL), then groups the results by guild_id and counts the membership_ids within each group to find the number of active members per guild.
+
+
+ 
+
+Question 45
+ 
+
+Task: Find the player_id and username of players who have sold at least one asset and bought at least one asset.
+
+Solution:
+
+SQL 
+SELECT
+p.player_id,
+p.username
+FROM
+Players AS p
+WHERE
+p.player_id IN (SELECT seller_player_id FROM MarketplaceTransactions)
+AND p.player_id IN (SELECT buyer_player_id FROM MarketplaceTransactions);
+
+Explanation: This query selects players from the Players table. It uses two IN subqueries: one to check if the player's ID exists in the seller_player_id column of MarketplaceTransactions, and another to check if their ID exists in the buyer_player_id column. Both conditions must be true for the player to be included.
+
+
+ 
+
+Question 46
+ 
+
+Task: Select username, total_game_time_minutes from players where total_game_time_minutes is above the average total_game_time_minutes of all players.
+
+Solution:
+
+SQL 
+SELECT
+username,
+total_game_time_minutes
+FROM
+Players
+WHERE
+total_game_time_minutes > (SELECT AVG(total_game_time_minutes) FROM Players);
+
+Explanation: This query uses a subquery (SELECT AVG(total_game_time_minutes) FROM Players) to first calculate the average total_game_time_minutes for all players. The outer query then filters the Players table to include only those players whose total_game_time_minutes is greater than this calculated average.
+
+
+ 
+
+Question 47
+ 
+
+Task: Find the asset_name of NFT_Assets that have been involved in MarketplaceTransactions more than the average number of transactions per asset.
+
+Solution:
+
+SQL 
+WITH AssetTransactionCounts AS (
+SELECT
+n.asset_name,
+COUNT(m.transaction_id) AS num_transactions
+FROM
+NFT_Assets AS n
+JOIN
+MarketplaceTransactions AS m ON n.asset_id = m.asset_id
+GROUP BY
+n.asset_name
+)
+SELECT
+asset_name
+FROM
+AssetTransactionCounts
+WHERE
+num_transactions > (SELECT AVG(num_transactions) FROM AssetTransactionCounts);
+
+Explanation: This query uses a Common Table Expression (CTE) named AssetTransactionCounts to first calculate the number of transactions for each unique NFT asset. Then, the main query selects asset_name from this CTE, filtering for assets whose individual transaction count (num_transactions) is greater than the overall average of these transaction counts (calculated in the subquery).
+
+
+ 
+
+Question 48
+ 
+
+Task: Find the player_id and username of players who have voted on all unique proposal_ids recorded in the GovernanceVotes table.
+
+Solution:
+
+SQL 
+SELECT
+p.player_id,
+p.username
+FROM
+Players AS p
+JOIN
+(
+SELECT
+gv.player_id
+FROM
+GovernanceVotes AS gv
+GROUP BY
+gv.player_id
+HAVING
+COUNT(DISTINCT gv.proposal_id) = (SELECT COUNT(DISTINCT proposal_id) FROM GovernanceVotes)
+) AS PlayersWhoVotedOnAll
+ON
+p.player_id = PlayersWhoVotedOnAll.player_id;
+
+Explanation: This query solves the "relational division" problem. It first finds the total count of distinct proposal_ids in the GovernanceVotes table. Then, it groups votes by player_id and uses a HAVING clause to filter for only those players whose count of distinct proposal_ids they voted on matches the total count of distinct proposal_ids. Finally, it joins this result with the Players table to get the usernames.
+
+
+ 
+
+Question 49
+ 
+
+Task: Find the asset_name and asset_type of NFT_Assets that have been transferred at least once (i.e., their current_owner_player_id is different from their original initial_mint_date owner, or they have been involved in a MarketplaceTransaction as a seller).
+
+Solution:
+
+SQL 
+SELECT DISTINCT
+n.asset_name,
+n.asset_type
+FROM
+NFT_Assets AS n
+JOIN
+MarketplaceTransactions AS m ON n.asset_id = m.asset_id;
+
+Explanation: This query identifies transferred assets by simply checking if they have any corresponding entry in the MarketplaceTransactions table. An INNER JOIN between NFT_Assets and MarketplaceTransactions on asset_id will only return assets that have been part of at least one transaction (implying a transfer from a seller to a buyer). DISTINCT is used to ensure each asset is listed only once, even if it has multiple transactions.
+
+
+ 
+
+Question 50
+ 
+
+Task: Find the player_id and username of players who registered in the year 2023 and have a total_game_time_minutes greater than 6000.
+
+Solution:
+
+SQL 
+SELECT
+player_id,
+username
+FROM
+Players
+WHERE
+YEAR(registration_date) = 2023 AND total_game_time_minutes > 6000;
+
+Explanation: This query filters the Players table for two conditions. It uses the YEAR() function (common in SQL dialects like MySQL/SQL Server) to extract the year from the registration_date column and checks if it's 2023. It then combines this with a check to ensure total_game_time_minutes is greater than 6000 using the AND operator.
+
