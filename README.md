@@ -1,4 +1,11 @@
 # SQL-Project-Web3-Gaming-Economy-Analysis-Challenges
+![Tool](https://img.shields.io/badge/Tool-SQL-orange?style=flat-square) 
+![Skills](https://img.shields.io/badge/Skills-Joins%20%7C%20Aggregations%20%7C%20CTEs-blue?style=flat-square) 
+![Focus](https://img.shields.io/badge/Focus-Web3%20Gaming%20Economy-lightblue?style=flat-square)
+![Dataset](https://img.shields.io/badge/Dataset-Player%20%7C%20Guilds%20%7C%20NFTs-green?style=flat-square) 
+![Challenge](https://img.shields.io/badge/Challenges-50%20SQL%20Problems-purple?style=flat-square) 
+![Status](https://img.shields.io/badge/Status-Completed-brightgreen?style=flat-square)
+
 This project contains 50 SQL challenges simulating analytics on a Web3 gaming platform. It covers querying player, guild, NFT, marketplace, and governance data to demonstrate skills like joins, aggregations, filtering, window functions, and subqueries for insightful analysis.
 
 # SQL Project: Web3 Gaming Economy Analysis Challenges
